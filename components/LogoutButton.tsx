@@ -9,7 +9,7 @@ export default function LogoutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: "/" })}
-      className="flex items-center gap-2 text-sm px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:border-red-300 hover:text-red-600"
+      className="flex items-center gap-2 text-sm px-5 py-2 rounded-pill border-2 border-pink text-pink-deep font-medium hover:bg-pink-light"
     >
       <LogOut size={16} /> Log out
     </button>

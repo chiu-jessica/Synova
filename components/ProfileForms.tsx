@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 const inputClass =
-  "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm";
+  "w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm focus:border-teal focus:outline-none";
 const buttonClass =
-  "px-4 py-2 rounded-lg bg-teal text-white text-sm flex items-center gap-2 disabled:opacity-50 w-fit";
+  "px-5 py-2 rounded-pill bg-teal-dark text-white text-sm font-medium flex items-center gap-2 disabled:opacity-50 hover:bg-teal-deep w-fit";
 
 type Status =
   | { type: "idle" }
@@ -31,7 +31,7 @@ function StatusMessage({ status }: { status: Status }) {
     return <p className="text-xs text-red-600">{status.message}</p>;
   }
   if (status.type === "success") {
-    return <p className="text-xs text-teal-dark">{status.message}</p>;
+    return <p className="text-xs text-teal-deep font-medium">{status.message}</p>;
   }
   return null;
 }

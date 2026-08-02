@@ -3,6 +3,81 @@
 @tailwind utilities;
 
 body {
-  color: #1C1C1C;
-  background: #FAFAFA;
+  color: #1c1c1c;
+  /* Warm off-white rather than grey, so the palette reads sunny instead of
+     clinical. */
+  background: #fffdf8;
+}
+
+/* Range slider. `accent-color` alone can't be styled on hover — the browser
+   picks its own hover thumb, which came out white — so the track and thumb
+   are drawn by hand instead. Colours are pink / pink-deep from the palette.
+   The filled length comes in as --fill-pct from the component; the fill
+   colour lives here so :active can darken it, which an inline gradient
+   could not be overridden to do. */
+.slider-pink {
+  --fill-color: #ffc0cb;
+  --fill-pct: 0%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--fill-color) 0 var(--fill-pct),
+    #fff0f3 var(--fill-pct) 100%
+  );
+  cursor: pointer;
+}
+
+/* Pressed: the filled track and the thumb both deepen together. */
+.slider-pink:active {
+  --fill-color: #f58ba0;
+}
+
+.slider-pink::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffc0cb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(28, 28, 28, 0.25);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.slider-pink:hover::-webkit-slider-thumb,
+.slider-pink:active::-webkit-slider-thumb,
+.slider-pink:focus-visible::-webkit-slider-thumb {
+  background: #b54360;
+}
+
+.slider-pink::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffc0cb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(28, 28, 28, 0.25);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.slider-pink:hover::-moz-range-thumb,
+.slider-pink:active::-moz-range-thumb,
+.slider-pink:focus-visible::-moz-range-thumb {
+  background: #b54360;
+}
+
+.slider-pink::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.slider-pink:focus-visible {
+  outline: 2px solid #b54360;
+  outline-offset: 2px;
 }

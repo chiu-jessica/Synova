@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { Atom, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import Logo from "@/components/Logo";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -39,7 +40,7 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <Atom className="text-teal mx-auto mb-4" size={28} />
+          <Logo size={56} className="mb-4" />
           <h1 className="text-xl font-medium mb-2">Create your account</h1>
           <p className="text-sm text-gray-500">
             For pediatric oncology clinical teams.
@@ -48,7 +49,7 @@ export default function RegisterPage() {
 
         <button
           onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          className="w-full px-5 py-2.5 rounded-lg border border-gray-200 text-sm"
+          className="w-full px-5 py-2.5 rounded-pill border-2 border-teal-light text-sm font-medium hover:bg-teal-light"
         >
           Sign up with Google
         </button>
@@ -71,7 +72,7 @@ export default function RegisterPage() {
               required
               autoComplete="name"
               placeholder="Jane Doe"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              className="w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm focus:border-teal focus:outline-none"
             />
           </div>
 
@@ -87,7 +88,7 @@ export default function RegisterPage() {
               required
               autoComplete="email"
               placeholder="janedoe@childrenshospital.org"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              className="w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm focus:border-teal focus:outline-none"
             />
           </div>
 
@@ -103,7 +104,7 @@ export default function RegisterPage() {
               required
               minLength={8}
               autoComplete="new-password"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              className="w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm focus:border-teal focus:outline-none"
             />
             <p className="text-xs text-gray-400 mt-1">At least 8 characters.</p>
           </div>
@@ -113,7 +114,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 px-5 py-2.5 rounded-lg bg-teal text-white text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="mt-2 px-5 py-2.5 rounded-pill bg-teal-dark text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-teal-deep disabled:opacity-50"
           >
             {submitting && <Loader2 size={14} className="animate-spin" />}
             {submitting ? "Creating account…" : "Create account"}

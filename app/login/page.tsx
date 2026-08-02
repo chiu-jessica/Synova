@@ -4,7 +4,8 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Atom, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import Logo from "@/components/Logo";
 
 // NextAuth redirects here with ?error=… when a provider sign-in fails —
 // including when Google sign-in is refused because the physicians row could
@@ -15,21 +16,26 @@ const providerErrors: Record<string, string> = {
   Configuration: "Sign-in is misconfigured. Contact your administrator.",
 };
 
-export default function LoginPage() {
+// Only this piece reads the URL. useSearchParams() suspends during
+// prerender, so it sits alone behind the Suspense boundary — wrapping the
+// whole form in one would leave the page blank until JS hydrated.
+function ProviderError({ hidden }: { hidden: boolean }) {
+  const providerError = useSearchParams().get("error");
+  if (!providerError || hidden) return null;
+
   return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
+    <p className="text-xs text-red-600 mb-4 text-center">
+      {providerErrors[providerError] ?? "Could not sign you in. Please try again."}
+    </p>
   );
 }
 
-function LoginForm() {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
-  const providerError = useSearchParams().get("error");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,19 +62,16 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-6">
-          <Atom className="text-teal mx-auto mb-4" size={28} />
-          <h1 className="text-xl font-medium mb-2">Sign in to Synova</h1>
+          <Logo size={56} className="mb-4" />
+          <h1 className="text-xl font-medium mb-2">Sign in to SYNOVA</h1>
           <p className="text-sm text-gray-500">
             For pediatric oncology clinical teams.
           </p>
         </div>
 
-        {providerError && !error && (
-          <p className="text-xs text-red-600 mb-4 text-center">
-            {providerErrors[providerError] ??
-              "Could not sign you in. Please try again."}
-          </p>
-        )}
+        <Suspense>
+          <ProviderError hidden={Boolean(error)} />
+        </Suspense>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
@@ -82,7 +85,7 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              className="w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm focus:border-teal focus:outline-none"
             />
           </div>
 
@@ -97,7 +100,7 @@ function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm"
+              className="w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm focus:border-teal focus:outline-none"
             />
           </div>
 
@@ -106,7 +109,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 px-5 py-2.5 rounded-lg bg-teal text-white text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+            className="mt-2 px-5 py-2.5 rounded-pill bg-teal-dark text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-teal-deep disabled:opacity-50"
           >
             {submitting && <Loader2 size={14} className="animate-spin" />}
             {submitting ? "Signing in…" : "Log in"}
@@ -121,7 +124,7 @@ function LoginForm() {
 
         <button
           onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          className="w-full px-5 py-2.5 rounded-lg border border-gray-200 text-sm"
+          className="w-full px-5 py-2.5 rounded-pill border-2 border-teal-light text-sm font-medium hover:bg-teal-light"
         >
           Sign in with Google
         </button>

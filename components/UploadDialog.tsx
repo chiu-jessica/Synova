@@ -66,13 +66,13 @@ export default function UploadDialog({ onClose }: { onClose: () => void }) {
       <div className="bg-white rounded-card p-6 w-[420px]">
         <h2 className="text-lg font-medium mb-4">Upload MRI scan</h2>
 
-        <label className="text-sm text-gray-600 block mb-1">Patient ID</label>
+        <label className="text-sm text-gray-700 block mb-1">Patient ID</label>
         <input
           value={patientId}
           onChange={(e) => setPatientId(e.target.value)}
           placeholder="BraTS-PED-00012"
           disabled={busy}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-4 disabled:bg-gray-50"
+          className="w-full border-2 border-teal-light rounded-pill px-4 py-2 text-sm mb-4 focus:border-teal focus:outline-none disabled:bg-gray-50"
         />
 
         <label
@@ -80,7 +80,7 @@ export default function UploadDialog({ onClose }: { onClose: () => void }) {
           className="border-2 border-dashed border-gray-200 rounded-card flex flex-col items-center justify-center gap-2 py-8 cursor-pointer hover:border-teal"
         >
           <UploadCloud size={24} className="text-gray-400" />
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-muted">
             {file ? file.name : "Drop a .nii.gz or DICOM file, or click to browse"}
           </span>
           <input
@@ -102,14 +102,14 @@ export default function UploadDialog({ onClose }: { onClose: () => void }) {
           <button
             onClick={onClose}
             disabled={busy}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-200 disabled:opacity-50"
+            className="px-5 py-2 text-sm rounded-pill border-2 border-teal-light hover:bg-teal-light disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!file || !patientId || busy}
-            className="px-4 py-2 text-sm rounded-lg bg-teal text-white flex items-center gap-2 disabled:opacity-50"
+            className="px-5 py-2 text-sm font-medium rounded-pill bg-teal-dark text-white flex items-center gap-2 hover:bg-teal-deep disabled:opacity-50"
           >
             {busy && <Loader2 size={14} className="animate-spin" />}
             {status === "uploading"

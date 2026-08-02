@@ -14,9 +14,9 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border border-gray-200 rounded-card p-5 bg-white">
+    <section className="rounded-card p-5 bg-white shadow-[0_1px_2px_rgba(28,28,28,0.06)]">
       <h2 className="font-medium text-sm mb-0.5">{title}</h2>
-      <p className="text-xs text-gray-500 mb-4">{description}</p>
+      <p className="text-xs text-muted mb-4">{description}</p>
       {children}
     </section>
   );
@@ -36,7 +36,7 @@ export default async function ProfilePage() {
         </p>
 
         <div className="flex flex-col gap-4">
-          <Section title="Name" description="How you appear across Synova.">
+          <Section title="Name" description="How you appear across SYNOVA.">
             <EditNameForm initialName={user.name} />
           </Section>
 

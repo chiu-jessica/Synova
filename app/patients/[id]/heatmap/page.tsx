@@ -10,13 +10,13 @@ const panels = [
 export default function HeatmapPage() {
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {panels.map(({ icon: Icon, label }) => (
           <div key={label}>
-            <div className="bg-white border border-gray-200 rounded-card h-[180px] flex items-center justify-center">
-              <Icon className="text-gray-300" size={26} />
+            <div className="bg-white rounded-card shadow-[0_1px_2px_rgba(28,28,28,0.06)] h-[260px] lg:h-[380px] xl:h-[440px] flex items-center justify-center">
+              <Icon className="text-teal/30" size={40} />
             </div>
-            <p className="text-xs text-gray-500 text-center mt-2">{label}</p>
+            <p className="text-sm text-muted text-center mt-2.5">{label}</p>
           </div>
         ))}
       </div>

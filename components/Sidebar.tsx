@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Upload, Users, Atom } from "lucide-react";
+import { Upload, Users } from "lucide-react";
+import Logo from "@/components/Logo";
 
 const navItems = [
   { href: "/dashboard", label: "Upload MRI", icon: Upload },
@@ -25,10 +26,9 @@ export default function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="w-[220px] shrink-0 bg-white border-r border-gray-200 flex flex-col p-4 gap-6 min-h-screen">
-      <div className="flex items-center gap-2 px-1">
-        <Atom className="text-teal" size={20} />
-        <span className="font-medium text-[16px]">Synova</span>
+    <aside className="w-[220px] shrink-0 bg-white border-r-2 border-teal-light flex flex-col p-4 gap-6 min-h-screen">
+      <div className="px-1">
+        <Logo size={26} showName nameClass="font-medium text-[16px] tracking-wide" />
       </div>
 
       <nav className="flex flex-col gap-1">
@@ -38,10 +38,10 @@ export default function Sidebar({
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm ${
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-pill text-sm ${
                 active
-                  ? "bg-teal-light text-teal font-medium"
-                  : "text-gray-600 hover:bg-gray-50"
+                  ? "bg-teal-dark text-white font-medium"
+                  : "text-gray-700 hover:bg-teal-light hover:text-teal-deep"
               }`}
             >
               <Icon size={18} />
@@ -53,9 +53,9 @@ export default function Sidebar({
 
       <Link
         href="/profile"
-        className="mt-auto flex items-center gap-2.5 px-2.5 py-2 border-t border-gray-200 pt-4"
+        className="mt-auto flex items-center gap-2.5 px-2.5 py-2 border-t-2 border-teal-light pt-4"
       >
-        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium shrink-0">
+        <div className="w-8 h-8 rounded-full bg-teal-light text-teal-deep flex items-center justify-center text-xs font-medium shrink-0">
           {initials}
         </div>
         <span className="text-sm text-gray-600 truncate">{physicianName}</span>

@@ -14,29 +14,50 @@ export default async function DiagnosisPage({
   params: { id: string };
 }) {
   const patient = await getPatientById(params.id);
-  if (!patient) return <p className="text-sm text-gray-500">Patient not found.</p>;
+  if (!patient) return <p className="text-sm text-muted">Patient not found.</p>;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white border border-gray-200 rounded-card h-[280px] flex flex-col items-center justify-center gap-2">
-        <ScanEye className="text-gray-300" size={28} />
-        <span className="text-xs text-gray-400">Tumor-representative slice</span>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div className="bg-white rounded-card shadow-[0_1px_2px_rgba(28,28,28,0.06)] min-h-[340px] lg:min-h-[500px] flex flex-col items-center justify-center gap-3">
+        <ScanEye className="text-teal/30" size={48} />
+        <span className="text-sm text-muted">Tumor-representative slice</span>
       </div>
 
       <div className="flex flex-col gap-5">
-        <div className="border border-gray-200 rounded-card p-5 bg-white">
-          <p className="text-xs text-gray-400 mb-1">Predicted subtype</p>
+        {/* Sized to its content rather than stretched to match the scan panel
+            beside it — matching heights left a lot of empty card. */}
+        <div className="rounded-card p-8 bg-white shadow-[0_1px_2px_rgba(28,28,28,0.06)] flex flex-col gap-7">
           {patient.subtype ? (
             <>
-              <p className="text-lg font-medium mb-4">
-                {subtypeLabel[patient.subtype]}
-              </p>
+              <div>
+                <p className="text-sm text-muted mb-2">Predicted subtype</p>
+                <p className="text-3xl font-medium leading-tight">
+                  {subtypeLabel[patient.subtype]}
+                </p>
+              </div>
+
               <ConfidenceBar score={patient.confidence ?? 0} />
+
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-3 pt-6 border-t border-black/5">
+                <div>
+                  <dt className="text-xs text-muted mb-1">Scan date</dt>
+                  <dd className="text-sm font-medium">{patient.uploadedAt}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted mb-1">Sequence</dt>
+                  <dd className="text-sm font-medium">
+                    {(patient.sequenceType ?? "—").toUpperCase()}
+                  </dd>
+                </div>
+              </dl>
             </>
           ) : (
-            <p className="text-sm text-gray-500">
-              Analysis pending — no result recorded for this scan yet.
-            </p>
+            <div className="text-center py-6">
+              <p className="text-sm font-medium mb-1">Analysis pending</p>
+              <p className="text-xs text-muted">
+                No result has been recorded for this scan yet.
+              </p>
+            </div>
           )}
         </div>
 
