@@ -11,7 +11,7 @@ const features = [
   { icon: Users, title: "Similar patient lookup", desc: "Reference comparable past cases alongside the current scan.", tint: "bg-pink-light text-pink-deep" },
   { icon: Upload, title: "Fast upload flow", desc: "Drag in a scan and get a structured result in seconds.", tint: "bg-yellow-light text-yellow-deep" },
   { icon: ShieldCheck, title: "Built for clinical review", desc: "Every AI output is framed as a decision-support estimate, not a diagnosis.", tint: "bg-teal-light text-teal-deep" },
-  { icon: Atom, title: "Interactive MRI viewer", desc: "Pan, zoom, and step through slices directly in the browser.", tint: "bg-orange-light text-orange-deep" },
+  { icon: Atom, title: "Scans kept with the patient", desc: "Every uploaded scan is stored and stays attached to its patient record.", tint: "bg-orange-light text-orange-deep" },
 ];
 
 const stepTint = [
@@ -122,7 +122,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="px-8 py-8 bg-teal-light text-center text-xs text-teal-deep">
-        SYNOVA · Demo environment — no real patient data.
+        SYNOVA
       </footer>
     </div>
   );

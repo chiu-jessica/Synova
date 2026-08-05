@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import PatientTabs from "@/components/PatientTabs";
+
 import { getPatientById } from "@/lib/patients";
 import { getCurrentUser } from "@/lib/current-user";
 import { ArrowLeft } from "lucide-react";

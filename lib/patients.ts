@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { getCurrentPhysicianId } from "@/lib/current-user";
 import { getSupabaseServiceClient } from "@/lib/supabase";
+import { SCAN_BUCKET, storagePrefixFor } from "@/lib/scans";
 import type { Subtype } from "@/lib/mock-data";
 
 // The flattened shape the patient list UI renders. Each patient is
@@ -17,6 +18,7 @@ export interface Patient {
 // Everything the single-patient views need on top of the list shape. The
 // url fields stay null until the analysis step fills them in.
 export interface PatientDetail extends Patient {
+  scanId: string | null;
   scanResultId: string | null;
   scanFileUrl: string | null;
   sequenceType: string | null;
@@ -79,6 +81,7 @@ function toPatientDetail(row: PatientRow): PatientDetail {
 
   return {
     ...toPatient(row),
+    scanId: scan?.id ?? null,
     scanResultId: result?.id ?? null,
     scanFileUrl: scan?.file_url ?? null,
     sequenceType: scan?.sequence_type ?? null,
@@ -137,39 +140,75 @@ export const getPatientById = cache(async function getPatientById(
   return data ? toPatientDetail(data as PatientRow) : null;
 });
 
+export interface ScanImages {
+  original: string | null;
+  segmentation: string | null;
+  gradcam: string | null;
+}
+
+// Turns the stored image paths into short-lived signed URLs. The bucket is
+// private, so the browser cannot read these objects directly.
+//
+// The Grad-CAM and segmentation paths come from `scan_results`. The original
+// slice has no column of its own, so its path is derived from the scan id —
+// the same convention /api/scans writes it under. A missing object simply
+// yields null and the UI falls back to its placeholder.
+export const getScanImages = cache(async function getScanImages(
+  patientId: string
+): Promise<ScanImages> {
+  const empty: ScanImages = { original: null, segmentation: null, gradcam: null };
+
+  const [patient, physicianId] = await Promise.all([
+    getPatientById(patientId),
+    getCurrentPhysicianId(),
+  ]);
+  if (!patient?.scanId || !physicianId) return empty;
+
+  const originalPath = `${storagePrefixFor(physicianId)}results/${patient.scanId}-original.png`;
+  const wanted = [
+    ["original", originalPath],
+    ["segmentation", patient.segmentationUrl],
+    ["gradcam", patient.heatmapUrl],
+  ] as const;
+
+  const paths = wanted.map(([, p]) => p).filter((p): p is string => Boolean(p));
+  if (paths.length === 0) return empty;
+
+  const { data, error } = await getSupabaseServiceClient()
+    .storage.from(SCAN_BUCKET)
+    .createSignedUrls(paths, 60 * 60);
+
+  if (error) {
+    console.error("Failed to sign scan images:", error.message);
+    return empty;
+  }
+
+  const byPath = new Map(
+    (data ?? [])
+      .filter((row) => row.signedUrl && !row.error)
+      .map((row) => [row.path, row.signedUrl] as const)
+  );
+
+  return {
+    original: byPath.get(originalPath) ?? null,
+    segmentation: patient.segmentationUrl
+      ? byPath.get(patient.segmentationUrl) ?? null
+      : null,
+    gradcam: patient.heatmapUrl ? byPath.get(patient.heatmapUrl) ?? null : null,
+  };
+});
+
 // The reference cohort the model matched against, joined through the
 // patient's most recent scan result.
 export async function getSimilarPatients(patientId: string): Promise<Patient[]> {
   const patient = await getPatientById(patientId);
-  if (!patient?.scanResultId) return [];
+  // Nothing to match on until this patient has a result of its own.
+  if (!patient?.subtype) return [];
 
-  const supabase = getSupabaseServiceClient();
+  const all = await getPatientsForCurrentPhysician();
 
-  const { data: links, error: linkError } = await supabase
-    .from("similar_patients")
-    .select("similar_patient_id")
-    .eq("scan_result_id", patient.scanResultId);
-
-  if (linkError) {
-    console.error("Failed to load similar patients:", linkError.message);
-    return [];
-  }
-
-  const ids = (links ?? []).map((l) => l.similar_patient_id as string);
-  if (ids.length === 0) return [];
-
-  // Not filtered by created_by: a comparison cohort is only useful if it can
-  // include cases from across the institution, and reaching it already
-  // required owning the scan result above.
-  const { data, error } = await supabase
-    .from("patients")
-    .select("*, scans(*, scan_results(*))")
-    .in("id", ids)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Failed to load similar patients:", error.message);
-    return [];
-  }
-  return ((data ?? []) as PatientRow[]).map(toPatient);
+  return all.filter(
+    (candidate) =>
+      candidate.id !== patient.id && candidate.subtype === patient.subtype
+  );
 }

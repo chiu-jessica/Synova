@@ -1,6 +1,7 @@
-import { getPatientById } from "@/lib/patients";
+import { getPatientById, getScanImages } from "@/lib/patients";
 import ConfidenceBar from "@/components/ConfidenceBar";
 import CaveatBanner from "@/components/CaveatBanner";
+import ScanImage from "@/components/ScanImage";
 import { ScanEye } from "lucide-react";
 
 const subtypeLabel: Record<string, string> = {
@@ -13,14 +14,24 @@ export default async function DiagnosisPage({
 }: {
   params: { id: string };
 }) {
-  const patient = await getPatientById(params.id);
+  const [patient, images] = await Promise.all([
+    getPatientById(params.id),
+    getScanImages(params.id),
+  ]);
   if (!patient) return <p className="text-sm text-muted">Patient not found.</p>;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-      <div className="bg-white rounded-card shadow-[0_1px_2px_rgba(28,28,28,0.06)] min-h-[340px] lg:min-h-[500px] flex flex-col items-center justify-center gap-3">
-        <ScanEye className="text-teal/30" size={48} />
-        <span className="text-sm text-muted">Tumor-representative slice</span>
+      <div>
+        <ScanImage
+          src={images.original}
+          alt="Tumor-representative slice"
+          icon={<ScanEye className="text-teal/30" size={48} />}
+          className="h-[340px] lg:h-[500px]"
+        />
+        <p className="text-sm text-muted text-center mt-2.5">
+          Tumor-representative slice
+        </p>
       </div>
 
       <div className="flex flex-col gap-5">

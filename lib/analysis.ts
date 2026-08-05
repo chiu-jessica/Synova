@@ -1,31 +1,47 @@
 import type { Subtype } from "@/lib/mock-data";
 
+export const MODEL_SERVICE_URL =
+  process.env.MODEL_SERVICE_URL ?? "http://localhost:8000";
+
+// Shape returned by the FastAPI service's POST /predict.
 export interface AnalysisResult {
-  predictedSubtype: Subtype;
+  predicted_subtype: Subtype;
   confidence: number;
-  heatmapUrl: string | null;
-  segmentationUrl: string | null;
+  slice_index_used?: number;
+  original_image_base64: string;
+  gradcam_image_base64: string;
+  segmentation_image_base64?: string;
 }
 
-const SUBTYPES: Subtype[] = ["high_grade_astrocytoma", "DMG_DIPG"];
+export class ModelServiceError extends Error {
+  constructor(message: string, readonly unreachable = false) {
+    super(message);
+    this.name = "ModelServiceError";
+  }
+}
 
-// MOCK inference. This is the single seam where the real model gets wired in:
-// replace the body with a call to the model-serving backend (e.g. a FastAPI
-// service given a signed URL for `storagePath`), and store the heatmap /
-// segmentation images it returns in Supabase Storage. Every caller — the
-// upload flow and /api/analyze-scan — goes through here, so nothing else
-// needs to change.
-export async function analyzeScan(input: {
-  scanId: string;
-  storagePath: string;
-}): Promise<AnalysisResult> {
-  void input;
-  await new Promise((r) => setTimeout(r, 2000)); // simulate processing time
+// The single seam between the app and the model. Both callers go through
+// here: /api/analyze-scan proxies a browser FormData straight through, and
+// /api/scans rebuilds one from files it pulled out of Supabase Storage.
+export async function runInference(formData: FormData): Promise<AnalysisResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${MODEL_SERVICE_URL}/predict`, {
+      method: "POST",
+      body: formData,
+    });
+  } catch (err) {
+    throw new ModelServiceError(
+      `Could not reach the model service at ${MODEL_SERVICE_URL}. Is it running?`,
+      true
+    );
+  }
 
-  return {
-    predictedSubtype: SUBTYPES[Math.floor(Math.random() * SUBTYPES.length)],
-    confidence: +(0.7 + Math.random() * 0.25).toFixed(2),
-    heatmapUrl: "/placeholder-heatmap.png",
-    segmentationUrl: "/placeholder-segmentation.png",
-  };
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    console.error("Model service error:", res.status, detail.slice(0, 500));
+    throw new ModelServiceError("Model service failed to analyze this scan.");
+  }
+
+  return (await res.json()) as AnalysisResult;
 }

@@ -7,7 +7,6 @@ const tabs = [
   { href: "diagnosis", label: "Possible diagnosis" },
   { href: "heatmap", label: "Tumor heatmap" },
   { href: "similar", label: "Similar patients" },
-  { href: "viewer", label: "Interactive viewer" },
 ];
 
 // A client component purely so it can read the pathname — the patient layout
